@@ -1,21 +1,17 @@
+import { CreditCard } from "lucide-react";
+
 export default function HowItWorks() {
   return (
-    <section id="howItWorks" className="py-20">
+    <section id="howItWorks" className="">
       <div className="container mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-8">How It Works</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-4">
-            <h3 className="text-xl font-semibold mb-2">Step 1</h3>
-            <p>Description of service 1.</p>
-          </div>
-          <div className="p-4">
-            <h3 className="text-xl font-semibold mb-2">Step 2</h3>
-            <p>Description of service 2.</p>
-          </div>
-          <div className="p-4">
-            <h3 className="text-xl font-semibold mb-2">Service 3</h3>
-            <p>Description of service 3.</p>
-          </div>
+        <h2 className="text-[105px] text-primary text-center px-4 font-bold">
+          How It Works
+        </h2>
+        <h3 className="text-[60px] text-primary"> Get Started in <span className="text-secondary">3</span>Simple Steps</h3>
+        <div className="flex items-center justify-center gap-4 py-2">
+          <p className="text-lg text-gray-500">No credit card required</p>
+          <CreditCard className="w-10 h-10 text-gray-500" />
+          <p className="text-lg text-gray-500">Setup in 5 minutes</p>
         </div>
       </div>
     </section>
