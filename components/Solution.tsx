@@ -109,7 +109,7 @@ export default function Solution() {
   };
 
   return (
-    <section id="features" className="py-20 bg-background">
+    <section id="features" className="py-20">
       <div className="container mx-auto text-center flex flex-col items-center">
         <h2 className="text-6xl mb-8">one solution</h2>
         <img src="Logo-bigger.svg" alt="Logo" />

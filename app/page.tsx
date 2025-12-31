@@ -2,8 +2,9 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Solution from "@/components/Solution";
 import HowItWorks from "@/components/HowItWorks";
-import Pricing from "@/components/Pricing";
 import dynamic from "next/dynamic";
+import { CTASection } from "@/components/CTASection";
+import { Footer } from "@/components/Footer";
 
 const Problems = dynamic(() => import("@/components/Problems"), {
   ssr: false,
@@ -17,7 +18,7 @@ export default function Home() {
         <section id="home" className="w-full">
           <Hero />
         </section>
-        <section id="problems" className="w-full py-20">
+        <section id="problems" className="w-full">
           <Problems />
         </section>
         <section id="solution" className="w-full py-20">
@@ -26,8 +27,11 @@ export default function Home() {
         <section id="how-it-works" className="w-full py-20">
           <HowItWorks />
         </section>
-        <section id="pricing" className="w-full py-20">
-          <Pricing />
+        <section id="cta" className="w-full py-20">
+          <CTASection />
+        </section>
+        <section id="footer" className="w-full">
+          <Footer />
         </section>
       </div>
     </div>

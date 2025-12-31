@@ -33,7 +33,7 @@ const problemData: { iconName: string; title: string }[] = [
 
 export default function Problems() {
   return (
-    <section id="problems" className="py-24 bg-[#f8faff] overflow-hidden">
+    <section id="problems" className="py-24 bg-background overflow-hidden">
       <div className="container mx-auto px-4">
         {/* Removed border-t and border-l from container */}
         {/* Custom grid template for 0.5fr columns on edges */}
