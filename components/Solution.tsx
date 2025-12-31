@@ -1,9 +1,150 @@
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
+import StickyScreens from './StickyScreens';
+import { motion, useScroll } from 'framer-motion'
+import Lenis from 'lenis'
+import Link from 'next/link';
+
+interface TabItem {
+  id: string;
+  name: string;
+  src: string;
+  href: string;
+}
+
+const tabs: TabItem[] = [
+  { id: 'projectList', name: 'Project List', src: '/Project List.svg', href: 'projectList' },
+  { id: 'projectOverview', name: 'Project Overview', src: '/Project Overview.svg', href: 'projectOverview' },
+  { id: 'projectModules', name: 'Project Modules', src: '/Project Modules.svg', href: 'projectModules' },
+  { id: 'portfolio', name: 'Portfolio', src: '/Portfolio.svg', href: 'portfolio' },
+  { id: 'paymentList', name: 'Payment List', src: '/Payment List.svg', href: 'paymentList' },
+  { id: 'clientList', name: 'Client List', src: '/Client List.svg', href: 'clientList' },
+];
+
 export default function Solution() {
+  const container = useRef<HTMLDivElement>(null);
+  const lenisRef = useRef<Lenis | null>(null);
+  const [activeSection, setActiveSection] = useState("projectList");
+  const { scrollYProgress } = useScroll({
+    target: container,
+    offset: ['start start', 'end end']
+  });
+
+  // Use scroll progress to determine active section
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on('change', (latest) => {
+      // Each section takes up 1/6th of the scroll (0.16666666667)
+      // Calculate which section we're currently in
+      const sectionSize = 1 / tabs.length;
+      // Clamp the progress between 0 and 1
+      const clampedProgress = Math.max(0, Math.min(1, latest));
+      // Calculate section index - use the midpoint approach for smoother transitions
+      // Add half a section size to make transitions happen at section boundaries
+      let sectionIndex = Math.floor((clampedProgress + sectionSize / 2) / sectionSize);
+      // Ensure we don't go out of bounds
+      sectionIndex = Math.max(0, Math.min(sectionIndex, tabs.length - 1));
+      // Update active section
+      const newActiveId = tabs[sectionIndex].id;
+      setActiveSection(prev => prev !== newActiveId ? newActiveId : prev);
+    });
+
+    return () => unsubscribe();
+  }, [scrollYProgress]);
+  // smoothScroll
+  useEffect(() => {
+    const lenis = new Lenis({
+      autoRaf: true,
+    });
+    lenisRef.current = lenis;
+    lenis.on('scroll', (e) => {
+      console.log(e);
+    });
+    return () => {
+      lenis.destroy();
+    };
+  }, [])
+
+  const handleClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    e.preventDefault();
+    const element = document.getElementById(href);
+    if (!element || !container.current) {
+      console.log('Element or container not found', { href, element, container: container.current });
+      return;
+    }
+
+    // Immediately update active section for instant feedback
+    setActiveSection(href);
+
+    // Get the index of the clicked tab
+    const tabIndex = tabs.findIndex(tab => tab.id === href);
+    if (tabIndex === -1) {
+      console.log('Tab index not found', { href });
+      return;
+    }
+
+    // Calculate scroll position based on container and tab index
+    const containerRect = container.current.getBoundingClientRect();
+    const containerTop = containerRect.top + window.pageYOffset;
+    // Each section is 100vh, so we scroll to the position where this section would be centered
+    const targetY = containerTop + (tabIndex * window.innerHeight) - (window.innerHeight * 0.2);
+
+    console.log('Scrolling to', { href, tabIndex, targetY, containerTop });
+
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(targetY, {
+        duration: 1.5,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      });
+    } else {
+      // Fallback if Lenis isn't ready
+      window.scrollTo({
+        top: targetY,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
-    <section className="bg-gray-200 py-20">
-      <div className="container mx-auto text-center">
-        <h2 className="text-3xl font-bold mb-8">About Us</h2>
-        <p className="text-lg">We are a leading CRM provider.</p>
+    <section id="features" className="py-20 bg-background">
+      <div className="container mx-auto text-center flex flex-col items-center">
+        <h2 className="text-6xl mb-8">one solution</h2>
+        <img src="Logo-bigger.svg" alt="Logo" />
+        <p className="text-4xl pt-7 mb-16">The All-in-One Client & Project Platform</p>
+      </div>
+
+      {/* Container to limit sticky behavior */}
+      <div className="relative">
+        {/* Tab Navigation - Sticky at top */}
+        <div className="pt-6 pb-[48.5rem] mb-[50px] sticky top-[10vh] bottom-[100vh] z-20">
+          <div className="flex flex-wrap justify-center gap-3">
+            {tabs.map((tab, index) => (
+              <Link
+                key={tab.id}
+                href={`#${tab.id}`}
+                onClick={(e) => handleClick(e, tab.id)}
+                className={`px-6 py-3 rounded-full text-sm md:text-base font-medium transition-all duration-300 ${activeSection === tab.id
+                  ? 'bg-secondary text-white shadow-lg'
+                  : 'bg-white text-secondary border border-gray-300 hover:border-secondary hover:bg-gray-50'
+                  }`}
+              >
+                {tab.name}
+              </Link>
+            ))}
+          </div>
+          <div className='h-[100vh] absolute'></div>
+        </div>
+
+        {/* Stacked Screenshots */}
+        <div className="relative mt-[-40%]" ref={container}>
+          {tabs.map((tab, index) => {
+            const targetScale = 1 - ((tabs.length - index) * 0.05)
+            return <StickyScreens key={index} i={index} {...tab} range={[index * 0.16666666667, 1]} target={targetScale} progress={scrollYProgress} />
+          })}
+        </div>
       </div>
     </section>
   );
